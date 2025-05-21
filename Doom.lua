@@ -6,7 +6,7 @@
 -- Don't mod this mess. Please just make your own game which has readable code
 
 local path = "/"..fs.getDir(shell.getRunningProgram())
-local Pine3D = require("Pine3D-minified")
+local Pine3D = require("Pine3D")
 os.loadAPI(path.."/blittle")
 
 local objects = {}
@@ -65,8 +65,7 @@ function round(num, numDecimalPlaces)
 end
 
 local ThreeDFrame = Pine3D.newFrame()
-local blittleOn = true
-ThreeDFrame:highResMode(blittleOn)
+
 ThreeDFrame:setBackgroundColor(colors.lightGray)
 
 local environmentObjects = {
@@ -96,13 +95,6 @@ local function loadSettings()
 	submitScore = file.readLine()
 	graphics = file.readLine()
 	file.close()
-
-	if (graphics == "Good") then
-		blittleOn = true
-	else
-		blittleOn = false
-	end
-	ThreeDFrame:highResMode(blittleOn)
 end
 
 local function saveSettings()
@@ -781,7 +773,7 @@ local function viewHighscores(endless)
 	while true do
 		local event, key = os.pullEvent()
 		if event == "term_resize" then
-			termWidth, termHeight = term.getSize()
+			termWidth, termHeight = term.getSize(1)
 			ThreeDFrame:setSize(1, 1, termWidth, termHeight)
 			return viewHighscores(endless)
 		elseif event == "key" and key ~= keys.leftAlt and key ~= keys.f2 then
@@ -791,9 +783,9 @@ local function viewHighscores(endless)
 end
 
 local function startGame()
+	termWidth, termHeight = term.getSize(1)
 	loadSettings()
 	resetGame = false
-	ThreeDFrame:highResMode(blittleOn)
 	parallel.waitForAny(smoothKeyInput, rendering, gameUpdate)
 end
 
@@ -1242,7 +1234,7 @@ local function settingsMenu()
 				end
 			end
 		elseif event == "term_resize" then
-			termWidth, termHeight = term.getSize()
+			termWidth, termHeight = term.getSize(1)
 			ThreeDFrame:setSize(1, 1, termWidth, termHeight)
 			drawSettings()
 		end
@@ -1308,8 +1300,9 @@ local function mainMenu()
 				drawMenu()
 			end
 		elseif event == "term_resize" then
-			termWidth, termHeight = term.getSize()
+			termWidth, termHeight = term.getSize(1)
 			ThreeDFrame:setSize(1, 1, termWidth, termHeight)
+			termWidth, termHeight = term.getSize()
 			drawMenu()
 		end
 	end
@@ -1318,7 +1311,7 @@ end
 local function resizing()
 	while true do
 		os.pullEvent("term_resize")
-		termWidth, termHeight = term.getSize()
+		termWidth, termHeight = term.getSize(1)
 		ThreeDFrame:setSize(1, 1, termWidth, termHeight)
 	end
 end
